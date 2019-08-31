@@ -1,0 +1,96 @@
+'arrays
+'general-------diziler
+
+Option Base 1
+---------------
+Sub diziler()
+ReDim dizi(20)
+
+For i = 1 To 20
+dizi(i) = Cells(i, 1)
+Next i
+
+a = dizi(5)
+
+End Sub
+
+'create a function (must be created in a module
+
+(Genaral) ----- carp
+--------
+Public Function carp(a As Range, b As Range, c As Range)
+
+carp = a * b * c
+
+End Function
+
+'IF THEN ELSE
+
+CommandButton1-----Click
+---------------
+Private Sub CommandButton1_Click()
+a = Range("E2")
+
+If a < 31 Then
+Range("G4") = "FF"
+
+ElseIf a >= 31 And a < 51 Then
+Range("G4") = "DD"
+
+ElseIf a >= 51 And a < 71 Then
+Range("G4") = "CC"
+
+ElseIf a >= 71 And a < 91 Then
+Range("G4") = "BB"
+
+Else
+Range("G4") = "AA"
+
+End If
+End Sub
+
+'FOR NEXT
+(General)------donguler
+-------------
+Sub donguler()
+
+For i = 1 To 22
+
+If Cells(i, 1) > 30 Then Cells(i, 2) = Cells(i, 1) / 2
+
+Next i
+
+End Sub
+
+'Do While
+(Genaral)-------------dowhiletrue
+---------
+Sub dowhiletrue()
+
+i = 0
+Do While True
+i = i + 1
+
+Cells(i, 1) = i
+If i = 10 Then
+Exit Do
+End If
+
+Loop
+
+End Sub
+
+'Do Until Loop
+CommandButton1-----click
+------------
+Private Sub CommandButton1_Click()
+i = 1
+
+Do Until i > 5
+Cells(i, 1) = i
+i = i + 1
+Loop
+
+
+End Sub
+
