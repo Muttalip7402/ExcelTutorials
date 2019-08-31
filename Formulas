@@ -1,0 +1,45 @@
+'Offset
+=KAYDIR(A1;KAÇINCI(J2;A2:A13;0);KAÇINCI(J3;B1:F1;0);1;1)
+
+'index(indis)
+=İNDİS(A:A;KAÇINCI(E4;B:B;0);0)
+
+'MapDashBoard Vba 
+Sub renk()
+
+ActiveSheet.Shapes.Range(Array("tr")).Fill.ForeColor.RGB = vbRed
+a = Range("M1")
+ActiveSheet.Shapes(a).Fill.ForeColor.RGB = vbBlack
+
+
+If a = "Freeform 86" Then ActiveSheet.Shapes("Freeform 86").Fill.ForeColor.RGB = vbBlack
+If a = "Freeform 86" Then ActiveSheet.Shapes("Freeform 87").Fill.ForeColor.RGB = vbBlack
+
+
+If a = "Freeform 50" Then ActiveSheet.Shapes("Freeform 50").Fill.ForeColor.RGB = vbBlack
+If a = "Freeform 50" Then ActiveSheet.Shapes("Freeform 85").Fill.ForeColor.RGB = vbBlack
+
+End Sub
+
+Private Sub adıyamanL_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+Range("M1") = "Adıyaman"
+Call renk
+End Sub
+
+'Nested İf
+=EĞER(E2<31;B2;EĞER(VE(E2>=31;E2<=50);B3;EĞER(VE(E2>=51;E2<=70);B4;EĞER(VE(E2>=71;E2<=90);B5;B6))))
+
+'indirect
+=DÜŞEYARA(F3;DOLAYLI(F3);2;0)
+
+'countsif (Çokeğersay)
+=ÇOKEĞERSAY(B:B;">50000000";B:B;"<70000000")
+
+'sumsif (Çoketopla)
+=ÇOKETOPLA(D:D;A:A;I3;C:C;I4;B:B;I5)
+
+'conditional index and match
+=EĞER(UZUNLUK(I3)=3;İNDİS(C3:C14;KAÇINCI(I3;A3:A14;0);0);İNDİS(A3:A14;KAÇINCI(I3;C3:C14;0);0))
+
+'vlookupwithmatch
+=DÜŞEYARA(I3;A:E;KAÇINCI(J2;A1:E1;0);0)
