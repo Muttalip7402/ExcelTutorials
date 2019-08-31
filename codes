@@ -94,3 +94,101 @@ Loop
 
 End Sub
 
+'FOR EACH
+(General)------foreach
+-------------
+Sub foreach()
+Dim sayfa As Worksheet
+Dim sekmesayisi As Integer
+
+sekmesayisi = 100
+Worksheets.Add Count:=sekmesayisi
+i = 1
+For Each sayfa In Worksheets
+sayfa.Name = "MMB" & i
+i = i + 1
+'bu kod sayfayi korur
+'sayfa.Protect
+'sayfa.Unprotect
+
+
+
+Next sayfa
+
+End Sub
+
+'SELECT CASE
+(General)------selectcase
+-------------
+Sub selectcase()
+
+For i = 3 To 361
+a = Cells(i, 7)
+
+Select Case a
+Case 0 To 30: Cells(i, 8) = "FF"
+Case 31 To 50: Cells(i, 8) = "DD"
+Case 51 To 70: Cells(i, 8) = "CC"
+Case 71 To 90: Cells(i, 8) = "BB"
+Case 91 To 100: Cells(i, 8) = "AA"
+End Select
+
+Next i
+
+End Sub
+ 
+ 'Do Events
+ CommandButton1-----Click
+------------
+Private Sub CommandButton1_Click()
+
+For i = 1 To 1000000
+DoEvents
+Cells(i, 1) = i
+Next i
+
+
+End Sub
+
+'VLookup in vba
+(General)------duseyara
+-------------
+Sub duseyara()
+
+a = Range("H2")
+
+Range("I2") = Application.WorksheetFunction.VLookup(a, Range("A:B"), 2, 0)
+
+
+End Sub
+
+'Sumifs in vba
+(General)------sumifs
+-------------
+Sub coketopla()
+
+a = Range("H6")
+b = Range("I6")
+
+Range("J6") = Application.WorksheetFunction.SumIfs(Range("C:C"), Range("A:A"), a, Range("D:D"), b)
+
+End Sub
+
+-----------------
+CommandButton1-----Click
+------------
+Private Sub CommandButton1_Click()
+
+For i = 2 To 10
+
+Cells(i, 3) = Application.WorksheetFunction.SumIfs(Sheets("HAM").Range("C:C"), Sheets("HAM").Range("A:A"), Cells(i, 1))
+
+Next i
+
+
+Range("C11") = Application.WorksheetFunction.Sum(Range("C2:C10"))
+Range("C12") = Application.WorksheetFunction.Average(Range("C2:C10"))
+Range("C13") = Application.WorksheetFunction.Min(Range("C2:C10"))
+Range("C14") = Application.WorksheetFunction.Max(Range("C2:C10"))
+
+End Sub
