@@ -202,4 +202,145 @@ Sheets("Sheet1").Cells(1, 1) = deger
 
 End Function
 
+'SELECTION CHANGE
+Private Sub worksheet_selectionchange(ByVal secim As Range)
+'if ile tablo disi seçilmemesini de anlat
+Range("A1") = secim.Value
+
+End Sub
+
+'MAKE YOUR OWN FONCTIONS AS ADD IN
+
+Function RenkToplami(aralik As Range, hucre As Range)
+
+Sayi = aralik.Count
+
+Dim toplam As Double
+
+toplam = 0
+
+For i = 1 To Sayi
+
+If aralik(i).Interior.ColorIndex = hucre.Interior.ColorIndex Then
+
+toplam = toplam + aralik(i).Value
+
+End If
+
+Next i
+
+RenkToplami = toplam
+
+End Function
+
+Function YuzdeKac(aralik As Range, yuzde As Range)
+
+Dim toplam As Double
+
+toplam = Application.WorksheetFunction.Sum(aralik)
+
+YuzdeKac = yuzde / toplam
+
+End Function
+
+Function MinimumBul(aralik As Range)
+
+MinimumBul = Application.WorksheetFunction.min(aralik)
+
+End Function
+
+'CREATE BRIEFLIST BY USING MACRO (MAKRO ILE OZET LISTE OLUŞTURMAK)
+
+Private Sub CommandButton1_Click()
+Range("I2:J1000").ClearContents
+tarih = Range("H2")
+
+sonsatir = Cells(Rows.Count, "A").End(xlUp).Row
+
+For i = 2 To sonsatir
+    dongu = Application.WorksheetFunction.CountIf(Range("I:I"), "<>") + 1
+    If Cells(i, 2) = tarih Then
+    Cells(dongu, 9) = Cells(i, 1)
+    Cells(dongu, 10) = Cells(i, 3)
+    End If
+Next i
+
+
+End Sub
+
+'fILTER WHEN WRETTING (YAZARKEN FILTRE OLUŞURMAK)
+Private Sub TextBox1_Change()
+
+    Selection.AutoFilter
+    ActiveSheet.Range("$A$3:$A$84").AutoFilter Field:=1, Criteria1:=TextBox1.Value & "*", _
+        Operator:=xlAnd
+
+End Sub
+
+'BLOCK DOUBLE ENTRY (MÜKERRER KAYDIN ENGELLENMESİ)
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+
+For i = 1000 To 1 Step -1
+
+If WorksheetFunction.CountIf(Range("A2:A" & i), Cells(i, 1)) > 1 Then Rows(i).Delete
+
+Next i
+
+End Sub
+
+'VBE NESTED LOOP (İÇ İÇE DÖNGÜ OLUŞTURMAK)
+
+Private Sub CommandButton1_Click()
+sonsatir = Cells(Rows.Count, "H").End(xlUp).Row
+
+For i = 2 To sonsatir
+    
+    For y = 9 To 13
+    Cells(i, y) = WorksheetFunction.SumIfs(Range("B:B"), Range("A:A"), Cells(i, 8), _
+    Range("C:C"), Cells(1, y))
+    Next y
+
+Next i
+
+
+End Sub
+
+'ADD ODD AND EVEN NUMBERS (TEK VE ÇİFT SAYILARI TOPLAMAK)
+
+Private Sub CommandButton1_Click()
+
+For i = 1 To 30
+If i Mod 2 = 0 Then
+cifttoplam = cifttoplam + i
+Else
+tektoplam = tektoplam + i
+End If
+Next i
+
+MsgBox "Tek sayilarin toplami=" & " " & tektoplam _
+& vbCr & "Cift sayilarin toplami=" & " " & cifttoplam _
+, vbInformation
+
+End Sub
+
+'VBE CASCADING WITH ARRAY (ARRAY İLE CASCADİNG OLUŞTURMAK)
+
+Option Base 1
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+sonsatir = WorksheetFunction.CountIf(Range("A:A"), "<>")
+kactane = WorksheetFunction.CountIf(Range("A:A"), Range("F1"))
+ReDim dizi(kactane) As Variant
+
+y = 1
+
+For i = 1 To sonsatir
+
+If Cells(i, 1) = Range("F1") Then dizi(y) = Cells(i, 2)
+If Cells(i, 1) = Range("F1") Then y = y + 1
+
+Next i
+
+ListBox1.List = dizi
+End Sub
+
 
