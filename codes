@@ -343,4 +343,268 @@ Next i
 ListBox1.List = dizi
 End Sub
 
+'Bank Loan Back Payment Calculation List
+Private Sub CommandButton1_Click()
+Range("A9:E1000").ClearContents
+Range("B6") = Pmt(Range("B3") * 1.2, Range("B2"), Range("B1")) * -1
 
+vade = Range("B2")
+taksit = Range("B6")
+faiz = Range("B3")
+anapara = Range("B1")
+
+Range("A9") = "Dönem Sayisi"
+Range("B9") = "Faiz"
+Range("C9") = "KKDF"
+Range("D9") = "BSMV"
+Range("E9") = "Kalan Anapara"
+
+For i = 1 To vade
+Cells(i + 9, 1) = i
+Cells(i + 9, 2) = anapara * faiz
+Cells(i + 9, 3) = Cells(i + 9, 2) * 0.15
+Cells(i + 9, 4) = Cells(i + 9, 2) * 0.05
+toplamfaiz = Cells(i + 9, 2) + Cells(i + 9, 3) + Cells(i + 9, 4)
+odenenanapara = taksit - toplamfaiz
+kalananapara = anapara - odenenanapara
+Cells(i + 9, 5) = kalananapara
+
+anapara = kalananapara
+Next i
+
+Call bicimci
+End Sub
+
+
+'Excel Web Scrapping -1- BOOK SELLER
+
+Sub kitapsec()
+
+For i = 2 To 11
+On Error GoTo kac
+isbn = Cells(i, 1)
+
+Dim ie As New InternetExplorer
+ie.Visible = False
+ie.navigate "https://www.kitapsec.com/Search.php?a=" & isbn
+
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+
+Dim doc As HTMLDocument
+Set doc = ie.document
+
+kitapismi = doc.getElementsByClassName("text")(1).innerText
+Cells(i, 2) = kitapismi
+
+kitapfiyati = doc.getElementsByClassName("satis")(0).innerText
+Cells(i, 3) = kitapfiyati
+
+kac:
+Next i
+
+End Sub
+Sub maksimumkitap()
+On Error GoTo kac
+For i = 2 To 11
+isbn = Cells(i, 1)
+
+Dim ie As New InternetExplorer
+ie.Visible = False
+ie.navigate "https://www.maksimumkitap.com/AramaSonuc.asp?q=" & isbn
+
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+
+Dim doc As HTMLDocument
+Set doc = ie.document
+
+kitapfiyati = doc.getElementsByClassName("xsalepriceTL")(0).innerText
+Cells(i, 4) = kitapfiyati
+
+kac:
+Next i
+
+End Sub
+
+Private Sub CommandButton1_Click()
+isbn = Range("B1")
+
+Dim ie As New InternetExplorer
+ie.Visible = True
+ie.navigate "https://www.kitapsec.com/Search.php?a=" & isbn
+
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+
+
+Dim doc As HTMLDocument
+Set doc = ie.document
+
+kitapismi = doc.getElementsByClassName("text")(1).innerText
+Range("B2") = kitapismi
+
+kitapfiyati = doc.getElementsByClassName("satis")(0).innerText
+Range("B3") = kitapfiyati
+
+End Sub
+
+Private Sub CommandButton1_Click()
+Call kitapsec
+Call maksimumkitap
+
+MsgBox " işlem tamam"
+End Sub
+
+
+WEB SCRAPPING -2- N11.COM MARKETING SITE
+Private Sub CommandButton1_Click()
+Dim ie As New InternetExplorer
+Dim doc As HTMLDocument
+Dim doc2 As HTMLDocument
+
+ie.navigate "https://www.n11.com/giris-yap"
+ie.Visible = True
+
+
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+
+
+Set doc = ie.document
+doc.all.Email.Value = Range("A1")
+doc.all.Password.Value = Range("A2")
+Application.SendKeys "~"
+Application.Wait (Now + TimeValue("00:00:02"))
+
+arama = InputBox("Ne Arayım?")
+
+ie.Navigate2 "https://www.n11.com/arama?q=" & arama
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+
+Set doc2 = ie.document
+sonuc = doc2.getElementsByClassName("resultText ")(0).innerText
+MsgBox sonuc
+
+ie.Quit
+End Sub
+
+WEB SCRAPPING -3- MOVIE SITE
+Private Sub CommandButton1_Click()
+On Error Resume Next
+
+Dim ie As New InternetExplorer
+Dim obj As Object
+Dim obj2 As Object
+Dim oelt As Object
+Dim oelt2 As Object
+Dim lis As IHTMLElementCollection
+Dim lis2 As IHTMLElementCollection
+
+tarz = "Türkçe Dublaj"
+tur = "Aksiyon Filmleri"
+
+With ie
+.Visible = True
+.navigate "https://www.fullhdfilmizlesene.net/"
+
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+Application.Wait (Now + TimeValue("00:00:01"))
+
+For Each obj In ie.document.all.Item("tarz").Options
+If obj.innerText = tarz Then obj.Selected = True
+Next obj
+
+For Each obj2 In ie.document.all.Item("tur").Options
+If obj2.innerText = tur Then obj2.Selected = True
+Next obj2
+
+ie.document.forms(0).submit
+Do
+DoEvents
+Loop Until ie.readyState = READYSTATE_COMPLETE
+Application.Wait (Now + TimeValue("00:00:01"))
+
+End With
+
+Set lis = ie.document.getElementsByTagName("li")
+a = lis.Length
+
+baslangic:
+Set lis2 = ie.document.getElementsByTagName("li")
+b = lis2.Length
+If b < a Then GoTo kurtul
+
+For x = 0 To 27
+sonsatir = Cells(Rows.Count, "A").End(xlUp).Row + 1
+    For Each oelt In ie.document.getElementsByClassName("dty")(x).getElementsByTagName("a")
+    If oelt.innerText <> "Aksiyon Film izle" Then Cells(sonsatir, 1) = oelt.innerText
+        For Each oelt2 In ie.document.getElementsByClassName("dty")(x).getElementsByTagName("span")
+        If oelt2.innerText Like "*IMDB*" Then Cells(sonsatir, 2) = oelt2.innerText
+        If oelt2.innerText Like "*Yapım*" Then Cells(sonsatir, 3) = oelt2.innerText
+        Next oelt2
+    Next oelt
+Next x
+
+
+For Each element In ie.document.getElementsByTagName("a")
+If element.innerText = "Ileri" Or element.innerText = "İleri" Then
+element.Click
+Application.Wait (Now + TimeValue("00:00:01"))
+End If
+Next element
+
+GoTo baslangic
+
+
+kurtul:
+ie.Quit
+MsgBox "bitti başkan"
+End Sub
+
+
+SEND PAYROLL AS PDF FILE VIA MAIL
+Private Sub CommandButton1_Click()
+Dim outapp As Outlook.Application
+Dim outmail As Outlook.MailItem
+
+For i = 2 To 11
+Range("G2") = Sheets("data").Cells(i, 1)
+Set outapp = New Outlook.Application
+
+With ActiveSheet.PageSetup
+.PrintArea = "$B$2:$J$18"
+.FitToPagesWide = 1
+.Orientation = xlLandscape
+End With
+
+gecicipath = ThisWorkbook.Path & "\"
+pdffile = gecicipath & Range("H2") & ".pdf"
+
+Set alan = Range(ActiveSheet.PageSetup.PrintArea)
+alan.ExportAsFixedFormat Type:=xlTypePDF, Filename:=pdffile, openafterpublish:=False
+
+Set outmail = outapp.CreateItem(olMailItem)
+With outmail
+.To = Range("L3")
+.Subject = "MAAŞ BORDROSU"
+.Body = "Sayın " & Range("H2") & vbCrLf & "Maaş bordronuz ektedir."
+.Attachments.Add pdffile
+.Send
+End With
+
+Kill pdffile
+Set outmail = Nothing
+Set outapp = Nothing
+
+Next i
+
+End Sub
