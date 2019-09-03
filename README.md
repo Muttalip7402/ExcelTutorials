@@ -1,2 +1,2 @@
 # ExcelTutorials
-That is my excel quick tip referance formulas and codes examples
+That is my excel quick tip reference formulas and codes examples
