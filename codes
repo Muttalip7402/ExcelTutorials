@@ -608,3 +608,188 @@ Set outapp = Nothing
 Next i
 
 End Sub
+
+'MAKE CELLS COLORFUL
+
+Private Sub CommandButton1_Click()
+satir = Cells(Rows.Count, "a").End(xlUp).Row
+sutun = Cells(1, Columns.Count).End(xlToLeft).Column
+
+Range(Cells(1, 3), Cells(satir, sutun)).Select
+Selection.Interior.Color = xlNone
+
+For i = 2 To satir
+birinci = WorksheetFunction.Large(Range(Cells(i, 3), Cells(i, sutun)), sutun - 2)
+xbirinci = WorksheetFunction.Match(birinci, Range(Cells(i, 3), Cells(i, sutun)), 0) + 2
+Cells(i, xbirinci).Interior.Color = RGB(197, 217, 241)
+
+ikinci = WorksheetFunction.Large(Range(Cells(i, 3), Cells(i, sutun)), sutun - 3)
+xikinci = WorksheetFunction.Match(ikinci, Range(Cells(i, 3), Cells(i, sutun)), 0) + 2
+Cells(i, xikinci).Interior.Color = RGB(255, 255, 137)
+
+ucuncu = WorksheetFunction.Large(Range(Cells(i, 3), Cells(i, sutun)), sutun - 4)
+xucuncu = WorksheetFunction.Match(ucuncu, Range(Cells(i, 3), Cells(i, sutun)), 0) + 2
+Cells(i, xucuncu).Interior.Color = RGB(255, 97, 97)
+
+Next i
+
+
+End Sub
+
+'CREATE NEW WORKBOOKS PER SHEETS
+
+Sub sekme_to_xlsx()
+Dim path As String
+path = "C:\Users\mbola\Desktop\sekmelere ayır"
+
+Application.ScreenUpdating = False
+Application.DisplayAlerts = False
+
+For Each sekme In ThisWorkbook.Sheets
+sekme.Copy
+Application.ActiveWorkbook.SaveAs Filename:=path & "\" & sekme.Name & ".xlsx"
+Application.ActiveWorkbook.Close False
+Next
+
+Application.DisplayAlerts = True
+Application.ScreenUpdating = True
+
+End Sub
+
+'DELETE DUPLICATE PICTURES
+
+Public Sub uzanti_listele()
+Const strfolder As String = "C:\Users\mbola\Desktop\resimler\" 'kendi dosya uzantınızı yazın.
+Dim strfile As String
+strfile = Dir(strfolder, vbNormal)
+
+Do While Len(strfile) > 0
+sonsatir = Cells(Rows.Count, "a").End(xlUp).Row + 1
+Cells(sonsatir, 1) = strfolder & strfile
+strfile = Dir
+Loop
+End Sub
+
+Sub resim_ayrinti()
+Call uzanti_listele
+Dim yukseklik As Integer, genislik As Integer, wia As Object
+On Error Resume Next
+Set wia = CreateObject("WIA.imagefile")
+sonsatir = Cells(Rows.Count, "a").End(xlUp).Row
+
+For i = 2 To sonsatir
+Path = Cells(i, 1)
+wia.loadfile Path
+
+yukseklik = wia.Height
+genislik = wia.Width
+
+Dim fs, f, s
+Set fs = CreateObject("scripting.filesystemobject")
+Set f = fs.getfile(Path)
+s = f.datecreated
+
+
+Cells(i, 2) = yukseklik
+Cells(i, 3) = genislik
+Cells(i, 4) = s
+
+
+Next i
+Set wia = Nothing
+
+End Sub
+
+Sub sil()
+Dim silinecek As String
+sonsatir = Cells(Rows.Count, "a").End(xlUp).Row
+For i = 2 To sonsatir
+If Cells(i, 5) = "sil" Then Kill Cells(i, 1)
+Next i
+End Sub
+
+
+
+^RETRIVE DATA FROM CLOSED FILES
+
+Private Sub CommandButton1_Click()
+Dim k1, k2 As Workbook
+Dim s1, s2 As Worksheet
+Dim dosya As Variant
+
+Set k1 = ThisWorkbook
+Set s1 = k1.Sheets("mmb")
+
+sonsatir = Cells(Rows.Count, "a").End(xlUp).Row + 1
+
+dosya = Application.GetOpenFilename(FileFilter:="Excel Files(*.xls;*.xlsb;*.xlsx;*.xlsm),*.xls;*.xlsb;*.xlsx;*.xlsm", Title:="Dosya Seçin")
+
+If dosya = False Then
+Exit Sub
+End If
+
+Application.ScreenUpdating = False
+
+Set k2 = Workbooks.Open(dosya)
+With UserForm1.ListBox1
+For i = 1 To k2.Sheets.Count
+.AddItem k2.Sheets(i).Name
+Next i
+End With
+
+UserForm1.Show
+
+sekmeismi = UserForm1.ListBox1.Value
+
+
+Set s2 = k2.Sheets(sekmeismi)
+
+sonsatir2 = s2.Cells(Rows.Count, "a").End(xlUp).Row
+son_sutun = s2.Cells(1, Columns.Count).End(xlToLeft).Column
+
+
+If sonsatir2 = 0 Then
+MsgBox "Sayfa'da veri yok", vbCritical
+Application.ScreenUpdating = True
+Exit Sub
+
+Else
+s1.Range("B2") = WorksheetFunction.VLookup(s1.Range("A2"), s2.Range("A:C"), 2, 0)
+s1.Range("C2") = WorksheetFunction.VLookup(s1.Range("A2"), s2.Range("A:C"), 3, 0)
+
+'s2.Range(("A2"), s2.Cells(sonsatir2, son_sutun)).Copy s1.Cells(sonsatir, 1)
+MsgBox "Aktarım tamamdır", vbInformation
+End If
+
+k2.Close
+Set s2 = Nothing
+Set k2 = Nothing
+Set s1 = Nothing
+Set k1 = Nothing
+
+
+End Sub
+
+'CREATE REPORT PER CELL CLICK
+
+Private Sub worksheet_selectionchange(ByVal target As Range)
+If target.Value = vbNullString Or Len(target.Value) <> 7 Then Exit Sub
+sonsatir = Sheets("Data").Cells(Rows.Count, "a").End(xlUp).Row
+
+Sheets("Report").Range("A:E").Clear
+Sheets("Data").Activate
+Sheets("Data").Range("A1:E" & sonsatir).Select
+Selection.AutoFilter field:=1, Criteria1:=target.Value
+Selection.Copy
+
+Sheets("Report").Range("A1").PasteSpecial xlValues
+Sheets("Report").Range("A1").PasteSpecial xlFormats
+
+Selection.AutoFilter
+Sheets("Report").Activate
+Application.CutCopyMode = False
+
+
+End Sub
+
+
