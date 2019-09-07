@@ -1,0 +1,36 @@
+'EXCEL AND ACCESS CONNECTION
+
+Private Sub CommandButton1_Click()
+Dim baglan As New Connection
+Dim rs As New Recordset
+
+baglan.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\OZTURK\Desktop\M.MUSTAFA BOLAT OFİS EĞTİM SETİ\Excel-Access\dosyalar\tablolar.accdb;"
+rs.Open "SELECT * FROM firmalar", baglan, adOpenKeyset, adLockOptimistic
+
+With ListBox1
+.ColumnCount = 8
+.Column = rs.GetRows
+End With
+
+rs.Close
+baglan.Close
+End Sub
+
+'ADD NEW DATA FROM EXCEL TO ACCESS
+
+Private Sub CommandButton2_Click()
+
+Dim baglan As New Connection
+Dim rs As New Recordset
+
+baglan.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\OZTURK\Desktop\M.MUSTAFA BOLAT OFİS EĞTİM SETİ\Excel-Access\dosyalar\tablolar.accdb;"
+rs.Open "SELECT * FROM firmalar where Kimlik ", baglan, adOpenKeyset, adLockOptimistic
+
+rs.AddNew
+rs.Fields(1).Value = Range("M1")
+rs.Update
+
+rs.Close
+baglan.Close
+End Sub
+
